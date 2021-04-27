@@ -3,7 +3,7 @@ module.exports = function learnSkill(mod) {
 	game.initialize(['inventory', 'contract']);
 	const { me, inventory } = game;
 
-	const reqSkillList = () => mod.send('C_SKILL_LEARN_LIST', 1);
+	const reqSkillList = () => mod.send('C_SKILL_LEARN_LIST', 2);
 
 	const reqSkillListWhenPossible = () => {
 		if (me.inCombat) {
@@ -23,10 +23,10 @@ module.exports = function learnSkill(mod) {
 		if (level <= 65) reqSkillListWhenPossible();
 	});
 
-	mod.hook('S_SKILL_LEARN_LIST', 1, e => {
-		for (const skill of e.skillList) {
-			if (skill.learned !== 1 || skill.price >= inventory.money) continue;
-			mod.send('C_SKILL_LEARN_REQUEST', 1, { unk1: 0, skill: skill.skill, type: 1 });
+	mod.hook('S_SKILL_LEARN_LIST', 2, e => {
+		for (const skill of e.skills) {
+			if (!skill.active || !skill.available || skill.requiredMoney >= inventory.money) continue;
+			mod.send('C_SKILL_LEARN_REQUEST', 2, { id: skill.id, active: true });
 		}
 	});
 };
